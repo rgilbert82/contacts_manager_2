@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <title>Contact Manager</title>
+    <meta charset="UTF-8" />
+    <script src="javascripts/jquery-3.1.1.js"></script>
+    <script src="javascripts/handlebars-v4.0.5.js"></script>
+    <script src="javascripts/contacts.js"></script>
+    <link rel="stylesheet" href="stylesheets/whitespace-reset.css" />
+    <link rel="stylesheet" href="stylesheets/styles.css" />
+  </head>
+
+  <body>
+    <header>
+      <img src="images/contacts.png" />
+      <h1>Contacts Manager</h1>
+    </header>
+
+    <main>
+      <section>
+        <div id="grayBlock">
+          <div>
+            <a href="#" id="addContact">Add Contact</a>
+          </div><!--
+          --><div id="searchContacts">
+            <form action="#" method="get">
+              <input type="text" name="search" id="search" placeholder="Search" autocomplete="off" />
+            </form>
+          </div><!--
+        --><div>
+            <a href="#" id="manageTags">Manage Groups</a>
+          </div>
+        </div>
+
+        <div id="tagSearch">
+          <ul>
+          </ul>
+        </div>
+
+        <div id="contactsList">
+          <ul>
+          </ul>
+        </div>
+      </section>
+
+      <footer>
+        <p>&copy; Contacts Manager <strong>2016</strong></p>
+      </footer>
+
+      <!-- MODALS -->
+
+      <div id="createContact">
+        <div>
+          <h2>Add Contact</h2>
+          <form action="#" method="post" id="add">
+            <label for="name" class="create" >Full Name:</label><!--
+            --><input type="text" name="name" class="create" id="name" required/><!--
+            --><label for="email" class="create">Email Address:</label><!--
+            --><input type="email" name="email" id="email" class="create"/><!--
+            --><label for="phone" class="create">Telephone Number:</label><!--
+            --><input type="tel" name="phone" class="create" id="phone" />
+            <h3>Group</h3>
+            <ul id="tagRadios">
+            </ul>
+            <div>
+              <a href="#">Cancel</a>
+              <input type="submit" value="Submit" />
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="modalLayer">
+      </div>
+
+      <div id="tagManagerModal">
+        <h2>Manage Groups</h2>
+        <div id="currentTags">
+          <ul>
+          </ul>
+          <a href="#" id="deleteTag">Delete Selected Groups</a>
+        </div>
+        <form action="#" method="post" id="addNewTag">
+          <h3>Add New Group</h3>
+          <input type="text" name="newTag" id="newTag" placeholder="Group Name" autocomplete="off"/>
+          <div>
+            <a href="#" class="cancel">Cancel</a>
+            <input type="submit" value="Submit" />
+          </div>
+        </form>
+      </div>
+
+      <div id="edit">
+      </div>
+    </main>
+
+    <!-- TEMPLATES -->
+
+    <script id="tagTemplate" type="text/x-handlebars">
+      <li>
+        <input type="radio" name="tag" id="radio_{{tag}}" value="{{tag}}" hidden/>
+        <label for="radio_{{tag}}">{{tag}}</label>
+      </li>
+    </script>
+
+    <script id="tagTemplate2" type="text/x-handlebars">
+      <li>
+        <input type="radio" name="tag" id="tag_edit_{{tag}}" value="{{tag}}" hidden {{#if checked}}checked{{/if}}/>
+        <label for="tag_edit_{{tag}}">{{tag}}</label>
+      </li>
+    </script>
+
+    <script id="tagDeleteTemplate" type="text/x-handlebars">
+      <li>
+        <input type="checkbox" id="tag_delete_{{tag}}" value="{{tag}}" hidden/>
+        <label for="tag_delete_{{tag}}">{{tag}}</label>
+      </li>
+    </script>
+
+    <script id="tagSearchTemplate" type="text/x-handlebars">
+      <li>
+        <input type="checkbox" id="tag_{{tag}}" value="{{tag}}" hidden/>
+        <label for="tag_{{tag}}">{{tag}}</label>
+      </li>
+    </script>
+
+    <script id="tagListTemplate" type="text/x-handlebars">
+      {{#each tag}}
+      {{> tagTemplate}}
+      {{/each}}
+    </script>
+
+    <script id="tagManagementTemplate" type="text/x-handlebars">
+      {{#each tag}}
+      {{> tagDeleteTemplate}}
+      {{/each}}
+    </script>
+
+    <script id="tagSearchListTemplate" type="text/x-handlebars">
+      {{#each tag}}
+      {{> tagSearchTemplate}}
+      {{/each}}
+    </script>
+
+    <script id="contactsListTemplate" type="text/x-handlebars">
+      {{#each contacts}}
+      {{> contactTemplate}}
+      {{/each}}
+    </script>
+
+    <script id="contactTemplate" type="text/x-handlebars">
+      <li data-id="{{id}}" data-tag="{{tag}}">
+        {{#if name}}
+          <h2>{{name}}</h2>
+        {{^}}
+          <h2>__</h2>
+        {{/if}}
+        <dl>
+          <dt>Phone Number:</dt>
+          {{#if phone}}
+            <dd>{{phone}}</dd>
+          {{^}}
+            <dd>&nbsp;</dd>
+          {{/if}}
+        </dl>
+        <dl>
+          <dt>Email:</dt>
+          {{#if email}}
+            <dd>{{email}}</dd>
+          {{^}}
+            <dd>&nbsp;</dd>
+          {{/if}}
+        </dl>
+        <div>
+          <a id='editContact' href="#">Edit</a>
+          <a id='deleteContact' href="#">Delete</a>
+        </div>
+      </li>
+    </script>
+
+    <script id="editContactInfo" type="text/x-handlebars">
+      <form action="#" method="post">
+        <h2>Edit Contact</h2>
+        <input type="hidden" name="id" value="{{id}}" />
+        <label for="editName" class="create">Full Name:</label><!--
+        --><input type="text" name="name" id="editName" class="create" value="{{name}}"/><!--
+        --><label for="editEmail" class="create">Email Address:</label><!--
+        --><input type="email" name="email" id="editEmail" class="create" value="{{email}}"/><!--
+        --><label for="editPhone" class="create">Telephone Number:</label><!--
+        --><input type="tel" name="phone" id="editPhone" class="create" value="{{phone}}"/>
+        <h3>Group</h3>
+        <ul>
+          {{#each tags}}
+          {{> tagTemplate2}}
+          {{/each}}
+        </ul>
+        <div>
+          <a href="#">Cancel</a>
+          <input type="submit" value="Submit" />
+        </div>
+      </form>
+    </script>
+  </body>
+</html>
